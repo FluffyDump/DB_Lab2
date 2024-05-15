@@ -1,0 +1,40 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<style>
+    h1 {
+        text-align: center;
+    }
+
+    .submit-button {
+        display: inline-block;
+        padding: 12px 24px;
+        margin: 0 10px;
+        border: none;
+        border-radius: 15px;
+        background-color: #001F3F;
+        color: #fff;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        text-decoration: none;
+    }
+
+        .submit-button:hover {
+            background-color: #003366;
+        }
+</style>
+
+<h1>
+    Bankas
+</h1>
+
+<br />
+<br />
+
+<a href="/Banko_saskaitos" class="submit-button">Banko Sąskaitos</a>
+<a href="/Add" class="submit-button">Pridėti banko sąskaitą</a>

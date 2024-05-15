@@ -1,0 +1,537 @@
+﻿@page "{id?}"
+@model DB_Lab2.Pages.EditModel
+@{
+}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<header>
+    <script>
+        $(document).ready(function () {
+            $('#successMessage').hide();
+            $('#errorMessage').hide();
+
+            $('th').each(function () {
+                $(this).append('<span style="color: red;"> *</span>');
+            });
+        });
+    </script>
+</header>
+<style>
+    .input-group {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 10px;
+    }
+
+        .input-group label {
+            margin-bottom: 5px;
+        }
+
+        .input-group input {
+            padding: 8px;
+            border-radius: 15px !important;
+            border: 1px solid #ccc;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+            .input-group input[type="number"] {
+                padding: 8px;
+                border-radius: 15px !important;
+                border: 1px solid #ccc;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+    .custom-date-input {
+        padding: 8px;
+        border-radius: 15px !important;
+        border: 1px solid #ccc;
+        width: 230px;
+        box-sizing: border-box;
+    }
+
+    .submit-button {
+        display: inline-block;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 15px;
+        background-color: #001F3F;
+        color: #fff;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        .submit-button:hover {
+            background-color: #003366;
+        }
+
+    .add-new-button {
+        display: inline-block;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 10px;
+        background-color: #008000;
+        color: #fff;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        .add-new-button:hover {
+            background-color: #006400;
+        }
+
+    .remove-button {
+        display: inline-block;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 10px;
+        background-color: #FF0000;
+        color: #fff;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        .remove-button:hover {
+            background-color: #CC0000;
+        }
+
+    .input-group select {
+        width: 175px;
+    }
+
+    .custom-dropdown {
+        width: 160px !important;
+        padding: 8px;
+        border-radius: 15px !important;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+    }
+
+    .custom-client-dropdown {
+        width: 250px !important;
+        padding: 8px;
+        border-radius: 15px !important;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+    }
+
+    .success-message {
+        display: none;
+        position: fixed;
+        top: 15%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #4CAF50;
+        background-color: rgba(76, 175, 80, 0.8);
+        color: white;
+        padding: 15px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: top 3s ease-in-out;
+    }
+
+    .checkmark {
+        font-size: 24px;
+        margin-right: 10px;
+    }
+
+    .message {
+        font-size: 18px;
+    }
+
+    .error-message {
+        display: none;
+        position: fixed;
+        top: 15%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #FF0000;
+        color: white;
+        padding: 15px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 1;
+        transition: opacity 1s ease-in-out;
+    }
+
+        .error-message .error-mark {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+
+        .error-message .message {
+            font-size: 18px;
+        }
+
+    table td, table th {
+        padding: 10px;
+    }
+
+</style>
+
+<div id="successMessage" class="success-message">
+    <span class="checkmark">&#10003;</span>
+    <span class="message">Pakeitimai įvykdyti!</span>
+</div>
+
+<div id="errorMessage" class="error-message">
+    <span class="error-mark">❌</span>
+    <span class="message">Įvyko klaida!</span>
+</div>
+
+<div id="bankoSaskaita" class="input-section">
+    <h1>
+        Banko sąskaita
+    </h1>
+    <div class="input-group">
+        <label for="saskaitos_numeris">Sąskaitos numeris: <span style="color: red;">*</span></label>
+        <input type="text" id="saskaitos_numeris" asp-for="AccountModel.saskaitos_numeris" readonly style="background-color: #f2f2f2; cursor: not-allowed;" , disabled="disabled" />
+    </div>
+    <div class="input-group">
+        <label for="balansas">Balansas: <span style="color: red;">*</span></label>
+        <input type="number" id="balansas" asp-for="AccountModel.balansas" />
+    </div>
+
+    <div class="input-group">
+        <label for="dienos_limitas">Dienos limitas:</label>
+        <input type="number" id="dienos_limitas" asp-for="AccountModel.dienos_limitas" placeholder="Neįvestas limitas!" />
+    </div>
+
+    <div class="input-group">
+        <label for="savaites_limitas">Savaitės limitas:</label>
+        <input type="number" id="savaites_limitas" asp-for="AccountModel.savaites_limitas" placeholder="Neįvestas limitas!" />
+    </div>
+
+    <div class="input-group">
+        <label for="menesio_limitas">Mėnesio limitas:</label>
+        <input type="number" id="menesio_limitas" asp-for="AccountModel.menesio_limitas" placeholder="Neįvestas limitas!" />
+    </div>
+
+    <div class="input-group">
+        <label for="saskaitos_tipas">Sąskaitos tipas: <span style="color: red;">*</span></label>
+        @Html.DropDownListFor(model => model.AccountModel.saskaitos_tipas, (SelectList)ViewData["SaskaitosTipasDropdownOptions"], new { @class = "form-control custom-dropdown" })
+    </div>
+
+    <div class="input-group">
+        <label for="valiuta">Valiuta: <span style="color: red;">*</span></label>
+        @Html.DropDownListFor(model => model.AccountModel.valiuta, (SelectList)ViewData["CurrencyDropdownOptions"], new { @class = "form-control custom-dropdown" })
+    </div>
+</div>
+
+<br />
+
+<div id="klientas" class="input-section">
+    <h1>
+        Klientas
+    </h1>
+    <div class="input-group">
+        <label for="kliento_ID_asmensKodas">Kliento unikalus ID | asmens kodas: <span style="color: red;">*</span></label>
+        @Html.DropDownListFor(model => model.ClientModel.ID_asmensKodas, (SelectList)ViewData["klientas"], new { @class = "form-control custom-client-dropdown", style = "background-color: #f2f2f2; cursor: not-allowed; border-color: #ced4da; color: #495057;", disabled = "disabled" })
+    </div>
+</div>
+
+<br />
+
+<h1>
+    Sutartis
+</h1>
+<table id="contractTable" style="display: none;">
+    <thead>
+        <tr>
+            <th>Sutarties tipas</th>
+            <th>Sutarties data</th>
+            <th>Sutarties būsena</th>
+            <th>Darbuotojo unikalus ID | asmens kodas</th>
+        </tr>
+    </thead>
+    <tbody id="dataTable"></tbody>
+</table>
+
+<button onclick="addRow()" class="add-new-button">Pridėti naują sutartį</button>
+
+<script>
+    window.onload = function () {
+        populateTable();
+    };
+
+    function populateTable() {
+        var table = document.getElementById('dataTable');
+        var contracts = @Html.Raw(Json.Serialize(ViewData["Contracts"]));
+        var sutartiesTipai = @Html.Raw(Json.Serialize(ViewData["sutartiesTipai"]));
+        var busenuTipai = @Html.Raw(Json.Serialize(ViewData["busenuTipai"]));
+        var darbuotojai = @Html.Raw(Json.Serialize(ViewData["darbuotojai"]));
+
+        contracts.forEach(function (contract) {
+            var newRow = table.insertRow();
+
+            var cell1 = newRow.insertCell(0);
+            var cell2 = newRow.insertCell(1);
+            var cell3 = newRow.insertCell(2);
+            var cell4 = newRow.insertCell(3);
+            var cell5 = newRow.insertCell(4);
+            var cell6 = newRow.insertCell(5);
+
+            cell1.innerHTML = '<select name="ContractModel.sutarties_tipas" class="form-control custom-client-dropdown">' +
+                sutartiesTipai.map(function (tipas) {
+                    return '<option value="' + tipas.text + '"' + (tipas.text === contract.sutarties_tipas ? ' selected' : '') + '>' + tipas.text + '</option>';
+                }).join('') +
+                '</select>';
+
+            cell2.innerHTML = '<input type="date" class="custom-date-input" value="' + formatDate(contract.data) + '" />';
+
+            cell3.innerHTML = '<select name="ContractModel.busena" class="form-control custom-client-dropdown">' +
+                busenuTipai.map(function (busena) {
+                    return '<option value="' + busena.text + '"' + (busena.text === contract.busena ? ' selected' : '') + '>' + busena.text + '</option>';
+                }).join('') +
+                '</select>';
+
+            cell4.innerHTML = '<select name="WorkerModel.ID_asmensKodas" class="form-control custom-client-dropdown">' +
+                darbuotojai.map(function (darbuotojas) {
+                    return '<option value="' + darbuotojas.text + '"' + (darbuotojas.text === contract.pasirinktasDarbuotojas ? ' selected' : '') + '>' + darbuotojas.text + '</option>';
+                }).join('') +
+                '</select>';
+
+            cell5.innerHTML = '<button onclick="removeRow(this)" class="remove-button">Šalinti sutartį</button>';
+            cell6.innerHTML = '<input type="hidden" name="ContractModel.sutarties_ID" value="' + contract.sutarties_ID + '" />';
+        });
+        document.getElementById('contractTable').style.display = 'block';
+    }
+
+    function formatDate(dateString) {
+        var date = new Date(dateString);
+        var year = date.getFullYear();
+        var month = ('0' + (date.getMonth() + 1)).slice(-2);
+        var day = ('0' + date.getDate()).slice(-2);
+        return year + '-' + month + '-' + day;
+    }
+
+    function addRow() {
+        var table = document.getElementById('dataTable');
+
+        var thead = document.getElementsByTagName('thead')[0];
+        thead.style.display = 'table-header-group';
+
+        var newRow = table.insertRow();
+
+        var cell1 = newRow.insertCell(0);
+        var cell2 = newRow.insertCell(1);
+        var cell3 = newRow.insertCell(2);
+        var cell4 = newRow.insertCell(3);
+        var cell5 = newRow.insertCell(4);
+
+        var sutartiesTipaiOptions = JSON.parse('@Html.Raw(Json.Serialize(ViewData["sutartiesTipai"]))');
+        var busenuTipaiOptions = JSON.parse('@Html.Raw(Json.Serialize(ViewData["busenuTipai"]))');
+        var darbuotojaiOptions = JSON.parse('@Html.Raw(Json.Serialize(ViewData["darbuotojai"]))');
+
+        var sutartiesTipaiDropdown = generateDropdown(sutartiesTipaiOptions, 'ContractModel.sutarties_tipas');
+        var busenuTipaiDropdown = generateDropdown(busenuTipaiOptions, 'ContractModel.busena');
+        var darbuotojaiDropdown = generateDropdown(darbuotojaiOptions, 'WorkerModel.ID_asmensKodas');
+
+        cell1.appendChild(sutartiesTipaiDropdown);
+        cell2.innerHTML = '<input type="date" class="custom-date-input" />';
+        cell3.appendChild(busenuTipaiDropdown);
+        cell4.appendChild(darbuotojaiDropdown);
+        cell5.innerHTML = '<button onclick="removeRow(this)" class="remove-button">Šalinti sutartį</button>';
+    }
+
+    function removeRow(button) {
+        var row = button.closest('tr');
+        row.remove();
+
+        var table = document.getElementById('dataTable');
+        if (table.rows.length === 0) {
+            var thead = document.getElementsByTagName('thead')[0];
+            thead.style.display = 'none';
+        }
+    }
+
+    function generateDropdown(options, name) {
+        var dropdown = document.createElement('select');
+        dropdown.className = 'form-control custom-client-dropdown';
+        dropdown.name = name;
+
+        options.forEach(function (option) {
+            var optionElement = document.createElement('option');
+            optionElement.value = option.text;
+            optionElement.textContent = option.text;
+            dropdown.appendChild(optionElement);
+        });
+        return dropdown;
+    }
+</script>
+
+<div>
+    <div style="padding-bottom: 15px;"></div>
+    <button class="submit-button" type="submit">Saugoti</button>
+    <div style="padding-bottom: 23px;"></div>
+    <div style="font-size: small; color: red;">* Privalomi užpildyti laukai</div>
+</div>
+
+<script>
+    $('.submit-button').click(async function (e) {
+        e.preventDefault();
+
+        var isValid = validateRequiredFields();
+
+        if (!isValid) {
+            return;
+        }
+
+        var Account = {
+            saskaitos_numeris: $('#saskaitos_numeris').val(),
+            balansas: parseFloat($('#balansas').val()),
+            dienos_limitas: parseFloat($('#dienos_limitas').val()),
+            savaites_limitas: parseFloat($('#savaites_limitas').val()),
+            menesio_limitas: parseFloat($('#menesio_limitas').val()),
+            saskaitos_tipas: $('select[name="AccountModel.saskaitos_tipas"]').val(),
+            valiuta: $('select[name="AccountModel.valiuta"]').val()
+        };
+
+        var hasFutureDate = false;
+        var isDefault = false;
+        var tooOldDate = false;
+        var contractData = [];
+        var contractDataWorker = [];
+        $('#dataTable tr').each(function (index, row) {
+            if (index > -1) {
+                var contractRow = {
+                    sutarties_ID: $(row).find('input[name="ContractModel.sutarties_ID"]').val(),
+                    sutarties_tipas: $(row).find('select[name="ContractModel.sutarties_tipas"]').val(),
+                    data: $(row).find('input[type="date"]').val(),
+                    busena: $(row).find('select[name="ContractModel.busena"]').val(),
+                    pasirinktasDarbuotojas: $(row).find('select[name="WorkerModel.ID_asmensKodas"]').val()
+                };
+                contractData.push(contractRow);
+
+                var currentDate = new Date();
+                var contractDateStr = $(row).find('input[type="date"]').val();
+
+                var contractDate = new Date(contractDateStr);
+
+                if (isNaN(contractDate.getTime())) {
+                    e.preventDefault();
+                    isDefault = true;
+                    return false;
+                }
+
+                if (contractDate > currentDate) {
+                    hasFutureDate = true;
+                    return false;
+                }
+
+                if (contractDate.getFullYear() < 2000) {
+                    tooOldDate = true;
+                    return false;
+                }
+            }
+        });
+
+        if (hasFutureDate) {
+            alert("Sutartis negali turėti ateities datos!");
+            return;
+        } else if (isDefault) {
+            alert("Pasirinkite sutarties datą!");
+            return;
+        } else if (tooOldDate) {
+            alert("Pasirinkta per sena sutarties sudarymo data!");
+            return;
+        }
+
+        try {
+            const requestData = {
+                bankoSaskaitaData: Account,
+                sutartys: contractData,
+                pasirinktasDarbuotojas: contractDataWorker
+            };
+
+            const response = await fetch('/Edit?handler=UpdateData', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            });
+
+            if (response.ok) {
+                showSuccessMessage();
+
+                setTimeout(() => {
+                    window.location.href = '/Banko_saskaitos';
+                }, 1500);
+            } else {
+                showErrorMessage();
+            }
+        } catch (error) {
+            console.error('Error updating data:', error);
+        }
+    });
+
+    function showSuccessMessage() {
+        const successMessage = document.getElementById('successMessage');
+        successMessage.style.display = 'flex';
+
+        void successMessage.offsetHeight;
+
+        successMessage.style.top = '0';
+
+        setTimeout(() => {
+            successMessage.style.top = '-80px';
+        }, 2000);
+    }
+
+    function showErrorMessage() {
+        const errorMessage = document.getElementById('errorMessage');
+        errorMessage.style.display = 'flex';
+        errorMessage.style.opacity = '1';
+        void errorMessage.offsetHeight;
+        setTimeout(() => {
+            errorMessage.style.opacity = '0';
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+            }, 1000);
+        }, 2000);
+    }
+
+    function validateRequiredFields() {
+        var isValid = true;
+        $('.input-group').each(function () {
+            var label = $(this).find('label');
+            var input = $(this).find('input');
+            var select = $(this).find('select');
+            var span = label.find('span');
+
+            if (span && span.length && span.text().trim() === '*') {
+                if (input.length > 0 && (!input.val() || input.val().trim() === '')) {
+                    input.addClass('error');
+                    alert("Įveskite reikšmes į visus reikiamus laukelius!");
+                    isValid = false;
+                } else {
+                    input.removeClass('error');
+                    $(this).find('.error-message').remove();
+                }
+                select.removeClass('error');
+                $(this).find('.error-message').remove();
+            }
+        });
+        var saskaitosNumeris = document.getElementById('saskaitos_numeris').value;
+        var regex = /^LT\d{18}$/;
+        if (!regex.test(saskaitosNumeris)) {
+            alert("Neteisingas sąskaitos numerio formatas! Teisingas formatas privalo prasidėti raidėmis LT ir toliau privalo sekti 18 skaitmenų!");
+            isValid = false;
+        }
+        return isValid;
+    }
+</script>

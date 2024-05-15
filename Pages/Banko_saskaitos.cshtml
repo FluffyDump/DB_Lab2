@@ -1,0 +1,240 @@
+﻿@page
+@model DB_Lab2.Pages.Banko_saskaitosModel
+@{
+}
+<h1>
+	Banko sąskaitos - F1
+</h1>
+
+<div id="tableContainer"></div>
+
+<style>
+	table {
+		width: 100%;
+		border-collapse: collapse;
+	}
+
+	th {
+		border: 1px solid #dddddd;
+		padding: 8px;
+		text-align: left;
+	}
+
+	td {
+		border: 1px solid #dddddd;
+		padding: 8px;
+		text-align: left;
+	}
+
+	.submit-button {
+		display: inline-block;
+		padding: 12px 24px;
+		border: none;
+		border-radius: 15px;
+		background-color: #001F3F;
+		color: #fff;
+		font-size: 16px;
+		font-weight: bold;
+		cursor: pointer;
+		transition: background-color 0.3s;
+	}
+
+	.submit-button:hover {
+		background-color: #003366;
+	}
+
+	.pagination-button {
+		position: relative;
+		padding: 8px 16px;
+		top: -45px;
+		border: none;
+		border-radius: 5px;
+		background-color: #4CAF50;
+		color: white;
+		text-align: center;
+		text-decoration: none;
+		display: inline-block;
+		font-size: 14px;
+		margin: 2px;
+		cursor: pointer;
+	}
+
+	.pagination-button:hover {
+		background-color: #45a049;
+	}
+
+	.pagination-button.disabled {
+		background-color: #cccccc;
+		color: #666666;
+		cursor: not-allowed;
+	}
+
+</style>
+
+<script>
+	let currentPage = 1;
+	const entriesPerPage = 10;
+	let rowData = [];
+	const columnNames = ["Sąskaitos numeris", "Balansas", "Dienos limitas", "Savaitės limitas", "Mėnesio limitas", "Sąskaitos tipas", "Valiuta", "fk_Kliento ID"];
+
+	let addButton;
+	let newRecordContainer;
+	let newRecordTable;
+
+	async function fetchData(page) {
+		const response = await fetch(`/Banko_saskaitos?handler=ParseData&page=${page}`, {
+			method: 'POST'
+		});
+
+		if (response.ok) {
+			const data = await response.json();
+			rowData = data.rowData;
+			displayData();
+		} else {
+			window.location.href = '/Error'
+		}
+	}
+
+	function displayData() {
+		const tableContainer = document.getElementById('tableContainer');
+
+		const startIndex = (currentPage - 1) * entriesPerPage;
+		const endIndex = startIndex + entriesPerPage;
+		const currentData = rowData.slice(startIndex, endIndex);
+
+		const table = document.createElement('table');
+		const headerRow = document.createElement('tr');
+
+		columnNames.forEach(columnName => {
+			const th = document.createElement('th');
+			th.textContent = columnName;
+			headerRow.appendChild(th);
+		});
+		table.appendChild(headerRow);
+
+		currentData.forEach(row => {
+			const tr = document.createElement('tr');
+			const rowDataValues = row["table_B_data"].split(",");
+			rowDataValues.forEach(value => {
+				const td = document.createElement('td');
+				let trimmedValue = value.trim();
+				if (trimmedValue === "None") {
+					trimmedValue = "-";
+				}
+				if (trimmedValue.startsWith("(") && trimmedValue.endsWith("'")) {
+					trimmedValue = trimmedValue.substring(2, trimmedValue.length - 1);
+				}
+				if (trimmedValue.startsWith("Decimal('")) {
+					trimmedValue = trimmedValue.substring(9, trimmedValue.length - 2);
+				}
+				trimmedValue = trimmedValue.replace(/[')]/g, '');
+				td.textContent = trimmedValue;
+				tr.appendChild(td);
+			});
+
+			tr.appendChild(document.createTextNode('\u00A0'));
+
+			const deleteLink = document.createElement('a');
+			deleteLink.textContent = 'šalinti';
+			deleteLink.style.textDecoration = 'underline';
+			deleteLink.addEventListener('click', async function (event) {
+				event.preventDefault();
+
+				const accountNumber = rowDataValues[0].replace(/['()]/g, '');
+				const response = await fetch(`/Banko_saskaitos?handler=RemoveData`, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify(accountNumber)
+				});
+
+				if (response.ok) {
+					window.location.href = '/Banko_saskaitos'
+				} else {
+					alert("Įvyko klaida bandant išrinti pasirinktą banko saskaitą!");
+				}
+			});
+			deleteLink.href = '#';
+			tr.appendChild(deleteLink);
+
+
+			tr.appendChild(document.createTextNode('\u00A0|\u00A0'));
+
+			const editLink = document.createElement('a');
+			editLink.textContent = 'redaguoti';
+			editLink.style.textDecoration = 'underline';
+			editLink.href = `/Edit/${rowDataValues[0].replace(/['()]/g, '')}`;
+			tr.appendChild(editLink);
+
+			table.appendChild(tr);
+		});
+
+		addButton = document.createElement('button');
+		addButton.classList.add('submit-button');
+		addButton.type = 'button';
+		addButton.style.position = 'relative';
+		addButton.style.top = '60px';
+		addButton.style.right = '10px';
+
+
+		addButton.textContent = 'Pridėti naują įrašą';
+		addButton.style.textDecoration = 'underline';
+		addButton.addEventListener('click', function () {
+			window.location.href = '/Add';
+		});
+
+		tableContainer.innerHTML = '';
+		tableContainer.appendChild(table);
+		tableContainer.appendChild(addButton);
+		addButton.style.bottom = '10px';
+		addButton.style.right = '10px';
+
+		createPaginationButtons();
+	}
+
+	function createPaginationButtons() {
+		const totalPages = Math.ceil(rowData.length / entriesPerPage);
+		const paginationContainer = document.getElementById('paginationContainer');
+		if (!paginationContainer) return;
+		paginationContainer.innerHTML = '';
+
+		const previousButton = document.createElement('button');
+		previousButton.textContent = 'Atgal';
+		previousButton.classList.add('pagination-button');
+		previousButton.disabled = currentPage === 1;
+		previousButton.addEventListener('click', () => {
+			if (currentPage > 1) {
+				currentPage--;
+				displayData();
+			}
+		});
+		paginationContainer.appendChild(previousButton);
+
+		const nextButton = document.createElement('button');
+		nextButton.textContent = 'Pirmyn';
+		nextButton.classList.add('pagination-button');
+		nextButton.disabled = currentPage === totalPages;
+		nextButton.addEventListener('click', () => {
+			if (currentPage < totalPages) {
+				currentPage++;
+				displayData();
+			}
+		});
+		paginationContainer.appendChild(nextButton);
+
+		const emptyDiv = document.createElement('div');
+		emptyDiv.style.height = '20px';
+		paginationContainer.appendChild(emptyDiv);
+
+		const emptyDivs = document.createElement('div');
+		emptyDivs.style.height = '30px';
+		paginationContainer.appendChild(emptyDivs);
+	}
+
+	window.addEventListener('DOMContentLoaded', () => {
+		currentPage = 1;
+		fetchData(currentPage);
+	});
+</script>
+<div id="paginationContainer"></div>
